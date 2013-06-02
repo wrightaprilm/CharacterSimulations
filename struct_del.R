@@ -1,13 +1,11 @@
-#_____ evolving, random: 
-  a<-list.files()
-  for (x in a){
-get_file<-function(x){
-
- f<-read.csv(x,header=F)
+a<-list.files()
+for (x in a){
+get_file<-function(file){
+ f<-read.csv(x,header=F, stringsAsFactors = FALSE)
   return(f)
   return(x)
-  
-}
+  }
+
 
 strip_name<-function(f){
   name <- substr(a,0,nchar(a)-4)
@@ -16,13 +14,13 @@ strip_name<-function(f){
   seconds<-unlist(lapply(p, "[", 3))
   thirds<-unlist(lapply(p, "[", 4))
   combined<-cbind(firsts,seconds,thirds)
-  min_val<-apply(combined, 1, which.min) 
-  return(min_val)
+  max_val<-apply(combined, 1, which.max) 
+  return(max_val)
 }
 
 manip_mat<-function(f){
   c<-ncol(f)
-  for(i in min_val){
+  for(i in strip_name(max_val)){
     if(i == 1) {
       sub_trix <- f[,1:115]   
       other_trix <- f[,115:c]
@@ -45,7 +43,7 @@ delete_items<-function(sub_trix){
   c_sub<-ncol(sub_trix)
   r_sub<-nrow(sub_trix)
   total<-r_sub*c_sub
-  del=total*.1
+  del=total*.75
   h<-0
   while (h<del){
     new_sub <- sub_trix
@@ -73,21 +71,16 @@ delete_items<-function(sub_trix){
 
 combi_matrix<-function(matrix1, matrix,x){
   new_trix<-cbind(matrix1, matrix)
-  txt<-"/Users/aprilwright/Desktop/projectfiles/MorphSim/NexusFiles/charfull/het/10md/Slow/rando/v/"
+  txt<-"/Users/aprilwright/Desktop/projectfiles/MorphSim/NexusFiles/charfull/het/75md/Fast/rando/f/"
   fi<-paste(txt, x,sep="")
   write.table(new_trix, row.names=F,col.names =F,file = fi, sep=",")
 }
 
-
-
 get_file(x)
-strip_name(f)
 manip_mat(f)
 delete_items(sub_trix)
 combi_matrix(sub_trix, other_trix, x)
 }
-  
-
   
     
 
@@ -154,5 +147,5 @@ ________row-wise
   txt<-"/Users/aprilwright/Desktop/projectfiles/MorphSim/NexusFiles/charfull/het/10md/Slow/row-wise/f/"
   fi<-paste(txt, x,sep="")
   write.table(new_trix, row.names=F,col.names =F,file = fi, sep=",")  
-  }
+  
   
