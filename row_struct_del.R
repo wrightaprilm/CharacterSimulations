@@ -1,45 +1,77 @@
-a<-list.files(pattern=".csv")
+a<-list.files()
 for (x in a){
-  f<-read.csv(x,header=F, row.names=1)
+  get_file<-function(file){
+    f<-read.csv(x,header=F, stringsAsFactors = FALSE)
+    return(f)
+    return(x)
+  }
   
   
-  name <- substr(a,0,nchar(a)-4)
-  p<-strsplit(name, "_")
-  firsts<-unlist(lapply(p, "[", 2))
-  seconds<-unlist(lapply(p, "[", 3))
-  thirds<-unlist(lapply(p, "[", 4))
-  combined<-cbind(firsts,seconds,thirds)
-  min_val<-apply(combined, 1, which.min)
+  strip_name<-function(f){
+    name <- substr(a,0,nchar(a)-4)
+    p<-strsplit(name, "_")
+    firsts<-unlist(lapply(p, "[", 2))
+    seconds<-unlist(lapply(p, "[", 3))
+    thirds<-unlist(lapply(p, "[", 4))
+    combined<-cbind(firsts,seconds,thirds)
+    max_val<-apply(combined, 1, which.max) 
+    return(max_val)
+  }
   
-  
-  c<-ncol(f)
-  for(i in min_val){
-    if(i == 1) {
-      g <- f[1:19,0:115]
-      h <- f[20:75,0:length(f)]
-      h < as.matrix(h)
-      h[h == 1] <- "1"
-      h[h == 2] <- "2"
-      l <- f[1:19,116:length(f)]
-      g <- as.matrix(g)
-      g[g == 1 | 2] <- "?"
-      j <- cbind(g,l)
-      k<- rbind(j,h)
+  manip_mat<-function(f){
+    c<-ncol(f)
+    for(i in strip_name(max_val)){
+      if(i == 1) {
+        sub_trix <- f[,1:115]   
+        other_trix <- f[,115:c]
+      } 
+      else if(i == 2) {
+        sub_trix <- f[,116:231]      
+        other_trix <- f[,1:116, 231:c]
+      } 
+      else {
+        sub_trix<-f[,231:c]
+        other_trix <- f[,1:231]
+      }  
+      return(sub_trix)
+      return(other_trix)
     }
-    if(i == 2 | 3) {
-      g <- f[1:19,231:length(f)]
-      h <- f[20:75,0:length(f)]
-      h < as.matrix(h)
-      h[h == 1] <- "1"
-      h[h == 2] <- "2"
-      l <- f[1:19,0:230]
-      g <- as.matrix(g)
-      g[g == 1 | 2] <- "?"
-      j <- cbind(g,l)
-      k<- rbind(j,h)
- }      
-  }  
-  txt<-"/Users/aprilwright/Desktop/MorphSim/NexusFiles/charfull/het/full/All/upload/"
-  fi<-paste(txt, x,sep="")
-  write.table(k, row.names=T,col.names =F,file = x, sep=",")  
-}
+  } 
+  
+  
+  delete_items<-function(sub_trix){
+    c_sub<-ncol(sub_trix)
+    r_sub<-nrow(sub_trix)
+    total<-r_sub*c_sub
+    del=total*.75
+    h<-0
+    while (h<del){
+      new_sub <- sub_trix
+      c<-ncol(sub_trix)-1
+      r<-nrow(sub_trix)-1
+      rcol<-sample(2:c, 1, replace=T)
+      rrow<-sample(2:r, 1, replace=T)
+      plusrow<-rrow
+      pluscol<-rcol
+      rando<-sample(1:100, 1, replace=T)
+      randoc<-sample(1:100, 1, replace=T)
+      if(rcol<c && rrow<r) {new_sub[rrow,rcol]<- "?"
+      }
+      if (rando > 50) {prrow<-sample(1:plusrow, 1, replace=T)
+                       randoc<-sample(1:100, 1, replace=T)}
+      if (randoc > 50){prcol<-sample(1:pluscol, 1, replace=T)}
+      if(pluscol<c) {new_sub[rrow,pluscol]<- "?"
+      }
+      if(plusrow<r) {new_sub[rrow,rcol]<- "?"
+      }
+      h<-h+1
+    }
+    return(new_sub)
+  }
+  
+  combi_matrix<-function(matrix1, matrix,x){
+    new_trix<-cbind(matrix1, matrix)
+    txt<-"/Users/aprilwright/Desktop/projectfiles/MorphSim/NexusFiles/charfull/het/medium/10md/f/del/
+    fi<-paste(txt, x,sep="")
+    write.table(new_trix, row.names=F,col.names =F,file = fi, sep=",")
+  }
